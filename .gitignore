@@ -1,0 +1,9 @@
+*.pyc
+__pycache__
+.cache
+.vscode/settings.json
+requirements.txt
+notes.txt
+sketch.txt
+logs/
+out/
