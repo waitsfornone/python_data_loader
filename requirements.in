@@ -1,0 +1,7 @@
+requests
+flask-sqlalchemy
+flask-restful
+marshmallow-jsonapi
+flake8
+APScheduler
+psutil
