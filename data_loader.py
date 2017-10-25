@@ -8,6 +8,7 @@ import logging
 import logging.config
 import logging.handlers
 import data_job
+import thread
 
 from apscheduler.schedulers.blocking import BlockingScheduler
 
@@ -17,15 +18,17 @@ logger = logging.getLogger('dataExtract')
 
 
 def job():
-    data_job.GetData(
-        'testin',
-        'testing',
-        '/Users/tenders/Documents/code/python_data_loader',
-        'select * from pm20029.referrals limit 10',
-        '192.168.103.102',
-        'integration',
-        "(qaswedfr{};')",
-        'playmaker'
+    thread.start_new_thread(
+        data_job.GetData(
+            'testin',
+            'testing',
+            '/Users/tenders/Documents/code/python_data_loader',
+            'select * from pm20029.referrals limit 10',
+            '192.168.103.102',
+            'integration',
+            "(qaswedfr{};')",
+            'playmaker'
+            )
         )
 
 
