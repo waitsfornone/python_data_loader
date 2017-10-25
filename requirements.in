@@ -5,3 +5,5 @@ marshmallow-jsonapi
 flake8
 APScheduler
 psutil
+sqlalchemy
+psycopg2

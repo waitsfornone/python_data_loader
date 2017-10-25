@@ -20,7 +20,13 @@ def job():
     data_job.GetData(
         'testin',
         'testing',
-        '/Users/tenders/Documents/code/python_data_loader')
+        '/Users/tenders/Documents/code/python_data_loader',
+        'select * from pm20029.referrals limit 10',
+        '192.168.103.102',
+        'integration',
+        "(qaswedfr{};')",
+        'playmaker'
+        )
 
 
 if __name__ == '__main__':

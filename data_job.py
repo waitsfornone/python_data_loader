@@ -4,6 +4,7 @@ import time
 import os
 import psutil
 import logging
+import hashlib
 
 
 # Work on getting postgresql working first,
@@ -14,7 +15,7 @@ def freespace_check():
             'free')/1073741824
 
 
-def GetData(int_uuid, tenant_id, out_dir, purge_files=True):
+def GetData(int_uuid, tenant_id, out_dir, query, db_host, db_user, db_pass, db_name, purge_files=True):
     funclogger = logging.getLogger('dataExtract.getData')
     # Get current unix timestamp for filename
     epoch = int(time.time())
@@ -22,6 +23,7 @@ def GetData(int_uuid, tenant_id, out_dir, purge_files=True):
 
     # Get current PID for temp file
     cur_pid = os.getpid()
+    print(cur_pid)
 
     # Check the output directory for proper access
     if not os.path.isdir(out_dir) or not os.access(out_dir, os.W_OK):
@@ -64,14 +66,45 @@ def GetData(int_uuid, tenant_id, out_dir, purge_files=True):
             funclogger.error('Integration does not allow purging of files and there is not enough free space to generate data. Aborting job')
             return False
         funclogger.info('Purging of files is complete. Now generating data.')
-    return True
 
-# connect to the database
-# engine = create_engine('postgresql://scott:tiger@localhost/mydatabase')
+    # Hash the provided query for use in the output filename
+    query_hash = hashlib.md5(query).hexdigest()
+    print(query_hash)
+
+    # Creating output filename for Upload script
+    out_filename = '{}_{}_{}_{}.csv'.format(tenant_id, int_uuid, epoch, query_hash)
+    out_file = os.path.join(tmp_dir, out_filename)
+
+    # Query DB and generate temprary file
+
+    engine = sqlalchemy.create_engine('postgresql://{}:{}@{}/{}'.format(db_user, db_pass, db_host, db_name))
+    conn = engine.connect()
+    result = conn.execute(query)
+    with open(tmp_file, 'w') as tmp:
+        fl = csv.writer(tmp)
+        fl.writerow(result.keys())
+        fl.writerows(result)
+
+    # Rename temp file permanently
+    if not os.path.exists(tmp_file):
+        funclogger.error('Not output file was created. Aborting job.')
+        return False
+
+    if os.rename(tmp_file, out_file):
+        return out_file
+    else:
+        funclogger.error('Rename of file failed. Aborting job.')
+        return False
 
 
 if __name__ == '__main__':
     GetData(
         'testin',
         'testing',
-        '/Users/tenders/Documents/code/python_data_loader')
+        '/Users/tenders/Documents/code/python_data_loader',
+        'select * from table',
+        '192.168.103.102',
+        'integration',
+        "(qaswedfr{};')",
+        'playmaker'
+        )
