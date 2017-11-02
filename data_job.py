@@ -7,8 +7,6 @@ import logging
 import hashlib
 
 
-# Work on getting postgresql working first,
-# then worry about how to properly handle the other typical databases
 def freespace_check():
     return getattr(
             psutil.disk_usage(os.path.abspath(os.sep)),
@@ -76,7 +74,7 @@ def GetData(int_uuid, tenant_id, out_dir, query, db_host, db_user, db_pass, db_n
     out_file = os.path.join(tmp_dir, out_filename)
 
     # Query DB and generate temprary file
-
+    # There will need to be a logic set for different DB types
     engine = sqlalchemy.create_engine('postgresql://{}:{}@{}/{}'.format(db_user, db_pass, db_host, db_name))
     conn = engine.connect()
     result = conn.execute(query)
