@@ -7,3 +7,4 @@ APScheduler
 psutil
 sqlalchemy
 psycopg2
+flask-wtf
