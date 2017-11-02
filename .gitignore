@@ -7,3 +7,4 @@ notes.txt
 sketch.txt
 logs/
 out/
+*.db
