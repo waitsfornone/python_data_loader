@@ -9,3 +9,5 @@ logs/
 out/
 *.db
 TODO.txt
+*.csv
+.DS_Store

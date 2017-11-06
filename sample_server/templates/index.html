@@ -14,7 +14,7 @@
       </tr>
     {% for int in data %}
       <tr>
-        <td>{{ int.integration_name }}</td>          
+        <td>{{ int.integration_name }}</td>
         <td><a href="{{ url_for('edit_instruction', id=int.id) }}">{{ int.int_uuid }}</a></td>
         <td>{{ int.tenant_id }}</td>
         <td>{{ int.active }}</td>

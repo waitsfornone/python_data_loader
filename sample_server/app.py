@@ -1,11 +1,23 @@
 # This will be the app for serving the instructions and receiving the files
-from flask import (render_template, url_for, redirect)
+from flask import (render_template,
+                   url_for,
+                   redirect,
+                   jsonify,
+                   make_response,
+                   request,
+                   send_from_directory)
 from sample_server import create_app, DB
 from sample_server.models import Instructions
 from forms import InstructionForm
+from flask_uploads import UploadSet, configure_uploads
+import os
 
 
 app = create_app()
+
+file_set = UploadSet('approvedfiletypes', extensions='csv')
+app.config['UPLOADED_APPROVEDFILETYPES_DEST'] = 'data/client_files'
+configure_uploads(app, file_set)
 
 
 @app.cli.command()
@@ -18,13 +30,13 @@ def redodb():
     DB.drop_all()
     DB.create_all()
     tester = Instructions(
-        int_uuid = 'cb10d0df-7407-470d-a72e-6588b29c93cc',
-        tenant_id = '39468c53-157d-4952-999e-1ec37f1d6026',
-        integration_name = 'My Test Integration Instructions',
-        active = True,
-        run_next = False,
-        db_info = 'some db info',
-        command = 'This is my query'
+        int_uuid='cb10d0df-7407-470d-a72e-6588b29c93cc',
+        tenant_id='39468c53-157d-4952-999e-1ec37f1d6026',
+        integration_name='My Test Integration Instructions',
+        active=True,
+        run_next=False,
+        db_info='some db info',
+        command='This is my query'
     )
     DB.session.add(tester)
     DB.session.commit()
@@ -74,9 +86,34 @@ def edit_instruction(id):
     return render_template('add_instructions.html', form=form)
 
 
-@app.route('/files')
-def uploaded_files():
-    pass
+@app.route('/upload_files', methods=['GET', 'POST'])
+def upload_files():
+    if request.method == 'POST':
+        if file_set.save(request.files['file_set']):
+            return make_response(jsonify({'success': 'OK'}), 200)
+        else:
+            return make_response(jsonify({'error': 'file save failed'}), 200)
+    elif request.method == 'GET' and 'file_set' in request.files:
+        return make_response(jsonify({'error': 'wrong method to send file'}), 405)
+    else:
+        return make_response(jsonify({'error': 'no file provided'}), 400)
+
+
+@app.route('/files', methods=['GET'])
+def list_files():
+    filepath = os.path.join(app.root_path, '../' + app.config['UPLOADED_APPROVEDFILETYPES_DEST'])
+    data = sorted(os.listdir(filepath))
+    return render_template('files.html', files=data)
+
+
+@app.route('/<path:path>', methods=['GET'])
+def serve_file(path):
+    filename = path.split(os.sep)[-1]
+    return send_from_directory(
+        os.path.join(app.root_path, '../' + app.config['UPLOADED_APPROVEDFILETYPES_DEST']),
+        filename,
+        as_attachment=True
+    )
 
 
 if __name__ == "__main__":
