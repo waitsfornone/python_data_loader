@@ -11,7 +11,7 @@ from sample_server.models import Instructions
 from forms import InstructionForm
 from flask_uploads import UploadSet, configure_uploads
 import os
-
+import sqlalchemy
 
 app = create_app()
 
@@ -42,13 +42,13 @@ def redodb():
     DB.session.commit()
 
 
-@app.route('/')
+@app.route('/home')
 def index():
     integrations = Instructions.query.order_by(Instructions.tenant_id, Instructions.integration_name).all()
     return render_template('index.html', data=integrations)
 
 
-@app.route('/new', methods=['GET', 'POST'])
+@app.route('/integration/new', methods=['GET', 'POST'])
 def add_instructions():
     form = InstructionForm()
     if form.validate_on_submit():
@@ -86,7 +86,7 @@ def edit_instruction(id):
     return render_template('add_instructions.html', form=form)
 
 
-@app.route('/upload_files', methods=['GET', 'POST'])
+@app.route('/api/upload_files', methods=['GET', 'POST'])
 def upload_files():
     if request.method == 'POST':
         if file_set.save(request.files['file_set']):
@@ -106,7 +106,7 @@ def list_files():
     return render_template('files.html', files=data)
 
 
-@app.route('/<path:path>', methods=['GET'])
+@app.route('/files/<path:path>', methods=['GET'])
 def serve_file(path):
     filename = path.split(os.sep)[-1]
     return send_from_directory(
@@ -114,6 +114,23 @@ def serve_file(path):
         filename,
         as_attachment=True
     )
+
+
+# print(query.compile(compile_kwargs={"literal_binds": True}))
+@app.route('/api/<tenant_id>/<int_uuid>', methods=['GET'])
+def send_instructions(tenant_id, int_uuid):
+    info = DB.session.query(Instructions).filter(Instructions.int_uuid == int_uuid,
+                                                 Instructions.tenant_id == tenant_id,
+                                                 Instructions.active,
+                                                 Instructions.run_next).all()
+    # need to create a dictionary of the data we need to send down.
+    data = {}
+    for each in info[0].__dict__.keys():
+        if isinstance(info[0].__dict__[each], sqlalchemy.orm.state.InstanceState):
+            app.logger.info('not serializable!!')
+        else:
+            data[each] = info[0].__dict__[each]
+    return make_response(jsonify({'success': 'OK', 'data': data}), 200)
 
 
 if __name__ == "__main__":
