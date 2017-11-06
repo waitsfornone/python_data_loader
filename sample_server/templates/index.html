@@ -1,8 +1,27 @@
+<!-- This is the integrations/instruction list page -->
 {% extends "layout.html" %}
 
 {% block content %}
-  <h2>Menu</h2>
   <div>
-    <a href="{{ url_for('add_instructions') }}">Add Data Extract Job</a>
+    <table>
+      <tr>
+        <th>Integration Name</th>
+        <th>Integeration ID</th>
+        <th>Tenant ID</th>
+        <th>Active</th>
+        <th>Schedule</th>
+        <th>Run on Next Request</th>
+      </tr>
+    {% for int in data %}
+      <tr>
+        <td>{{ int.integration_name }}</td>          
+        <td><a href="{{ url_for('edit_instruction', id=int.id) }}">{{ int.int_uuid }}</a></td>
+        <td>{{ int.tenant_id }}</td>
+        <td>{{ int.active }}</td>
+        <td>{{ int.schedule }}</td>
+        <td>{{ int.run_next }}</td>
+      </tr>
+    {% endfor %}
+    </table>
   </div>
 {% endblock %}

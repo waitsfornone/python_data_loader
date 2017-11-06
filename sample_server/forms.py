@@ -4,7 +4,8 @@ from wtforms.validators import (UUID, DataRequired)
 
 
 class InstructionForm(FlaskForm):
-    integration_id = StringField(
+    integration_name = StringField('Integration Name', validators=[DataRequired()])
+    int_uuid = StringField(
         'Integration ID',
         validators=[UUID(), DataRequired()])
     tenant_id = StringField('Tenant ID', validators=[UUID(), DataRequired()])

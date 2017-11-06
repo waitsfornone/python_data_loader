@@ -8,6 +8,12 @@
       <meta name="viewport" content="width=device-width, initial-scale=1">
   </head>
   <body>
+    <h2>Menu</h2>
+    <div>
+      <a href="{{ url_for('index') }}">Home</a>
+      <a href="{{ url_for('add_instructions') }}">Add Data Extract Job</a>
+      <a href="{{ url_for('uploaded_files') }}">View Files</a>
+    </div>
     {% block content %}
     {% endblock %}
   </body>
