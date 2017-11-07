@@ -23,11 +23,11 @@ def job():
             'testin',
             'testing',
             '/Users/tenders/Documents/testing',
-            'select * from pm20029.referrals limit 10',
-            '192.168.103.102',
-            'integration',
-            "(qaswedfr{};')",
-            'playmaker'
+            'select * from table',
+            'IP address',
+            'username',
+            "password",
+            'DB'
             )
         )
 
