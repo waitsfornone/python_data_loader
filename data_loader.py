@@ -1,13 +1,8 @@
-"""
-Demonstrates how to use the blocking scheduler to schedule
-a job that executes on 3 second
-intervals.
-"""
-
 import logging
 import logging.config
 import logging.handlers
-import data_job
+from data_job import get_data
+from file_uploader import upload_file, upload_file_multi
 import thread
 
 from apscheduler.schedulers.blocking import BlockingScheduler
@@ -17,18 +12,30 @@ logging.config.fileConfig('logging.ini')
 logger = logging.getLogger('dataExtract')
 
 
+def get_jobs(tenant_id, integration_id):
+    pass
+
+
+def job_wrapper_for_sub():
+    fle = get_data(
+                   'testin',
+                   'testing',
+                   '/Users/tenders/Documents/testing',
+                   'select * from table',
+                   'IP address',
+                   'username',
+                   "password",
+                   'DB'
+                   )
+    if fle:
+        upload_file(fle)
+    else:
+        logger.error("No File to Upload!")
+
+
 def job():
     thread.start_new_thread(
-        data_job.GetData(
-            'testin',
-            'testing',
-            '/Users/tenders/Documents/testing',
-            'select * from table',
-            'IP address',
-            'username',
-            "password",
-            'DB'
-            )
+        job_wrapper_for_sub()
         )
 
 

@@ -13,15 +13,13 @@ def freespace_check():
             'free')/1073741824
 
 
-def GetData(int_uuid, tenant_id, out_dir, query, db_host, db_user, db_pass, db_name, purge_files=True):
+def get_data(int_uuid, tenant_id, out_dir, query, db_host, db_user, db_pass, db_name, purge_files=True):
     funclogger = logging.getLogger('dataExtract.getData')
     # Get current unix timestamp for filename
     epoch = int(time.time())
-    print(epoch)
 
     # Get current PID for temp file
     cur_pid = os.getpid()
-    print(cur_pid)
 
     # Check the output directory for proper access
     if not os.path.isdir(out_dir) or not os.access(out_dir, os.W_OK):
@@ -33,16 +31,13 @@ def GetData(int_uuid, tenant_id, out_dir, query, db_host, db_user, db_pass, db_n
     if not os.access(tmp_dir, os.W_OK):
         funclogger.error('No write access to directory for temp files. Aborting job.')
         return False
-    print(tmp_dir)
 
     # Setup the output file
     tmp_filename = "{}.csv".format(str(cur_pid))
     tmp_file = os.path.join(tmp_dir, tmp_filename)
-    print(tmp_filename)
 
     # Freespace check
     freespace = freespace_check()
-    print(freespace)
 
     # Purge logic
     if freespace < 10:
@@ -67,7 +62,6 @@ def GetData(int_uuid, tenant_id, out_dir, query, db_host, db_user, db_pass, db_n
 
     # Hash the provided query for use in the output filename
     query_hash = hashlib.md5(query).hexdigest()
-    print(query_hash)
 
     # Creating output filename for Upload script
     out_filename = '{}_{}_{}_{}.csv'.format(tenant_id, int_uuid, epoch, query_hash)
@@ -96,13 +90,13 @@ def GetData(int_uuid, tenant_id, out_dir, query, db_host, db_user, db_pass, db_n
 
 
 if __name__ == '__main__':
-    GetData(
+    get_data(
         'testin',
         'testing',
-        '/Users/tenders/Documents/code/python_data_loader',
-        'select * from table',
-        '192.168.103.102',
-        'integration',
-        "(qaswedfr{};')",
-        'playmaker'
+        '/Users/tenders/Documents/testing',
+        'query',
+        'Host',
+        'user',
+        "pass",
+        'db'
         )
