@@ -7,7 +7,7 @@ notes.txt
 sketch.txt
 logs/
 out/
-*.db
+data/instructions.db
 TODO.txt
 *.csv
 .DS_Store

@@ -2,7 +2,7 @@ import logging
 import logging.config
 import logging.handlers
 from data_job import get_data
-from file_uploader import upload_file, upload_file_multi
+from file_uploader import upload_file
 import thread
 
 from apscheduler.schedulers.blocking import BlockingScheduler

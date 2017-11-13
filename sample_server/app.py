@@ -12,6 +12,7 @@ from forms import InstructionForm
 from flask_uploads import UploadSet, configure_uploads
 import os
 import sqlalchemy
+from funcs import validate_int_uuid, validate_tenant_id
 
 app = create_app()
 
@@ -42,6 +43,7 @@ def redodb():
     DB.session.commit()
 
 
+@app.route('/')
 @app.route('/home')
 def index():
     integrations = Instructions.query.order_by(Instructions.tenant_id, Instructions.integration_name).all()
@@ -88,15 +90,25 @@ def edit_instruction(id):
 
 @app.route('/api/upload_files', methods=['GET', 'POST'])
 def upload_files():
+    if 'file_set' not in request.files:
+        return make_response(jsonify({'error': 'no file provided'}), 400)
     if request.method == 'POST':
+        filename = request.files['file_set']
+        filename_list = filename.split('_')
+        tenant_id = filename_list[0]
+        int_uuid = filename_list[1]
+        if not validate_tenant_id(tenant_id):
+            return make_response(jsonify({'error': 'Tenant ID not found'}), 200)
+        if not validate_int_uuid(int_uuid):
+            return make_response(jsonify({'error': 'Integration ID not found'}), 200)
         if file_set.save(request.files['file_set']):
             return make_response(jsonify({'success': 'OK'}), 200)
         else:
             return make_response(jsonify({'error': 'file save failed'}), 200)
-    elif request.method == 'GET' and 'file_set' in request.files:
+    elif request.method == 'GET':
         return make_response(jsonify({'error': 'wrong method to send file'}), 405)
     else:
-        return make_response(jsonify({'error': 'no file provided'}), 400)
+        return make_response(jsonify({'error': 'not sure what to do here'}), 400)
 
 
 @app.route('/files', methods=['GET'])
@@ -117,20 +129,30 @@ def serve_file(path):
 
 
 # print(query.compile(compile_kwargs={"literal_binds": True}))
+@app.route('/api/<tenant_id>', methods=['GET'])
 @app.route('/api/<tenant_id>/<int_uuid>', methods=['GET'])
-def send_instructions(tenant_id, int_uuid):
-    info = DB.session.query(Instructions).filter(Instructions.int_uuid == int_uuid,
-                                                 Instructions.tenant_id == tenant_id,
-                                                 Instructions.active,
-                                                 Instructions.run_next).all()
-    # need to create a dictionary of the data we need to send down.
+def send_instructions(tenant_id, int_uuid=None):
+    if int_uuid:
+        info = DB.session.query(Instructions).filter(Instructions.int_uuid == int_uuid,
+                                                     Instructions.tenant_id == tenant_id,
+                                                     Instructions.active,
+                                                     Instructions.run_next).all()
+    else:
+        info = DB.session.query(Instructions).filter(Instructions.tenant_id == tenant_id,
+                                                     Instructions.active,
+                                                     Instructions.run_next).all()
     data = {}
-    for each in info[0].__dict__.keys():
-        if isinstance(info[0].__dict__[each], sqlalchemy.orm.state.InstanceState):
-            app.logger.info('not serializable!!')
-        else:
-            data[each] = info[0].__dict__[each]
-    return make_response(jsonify({'success': 'OK', 'data': data}), 200)
+    row_num = 0
+    for row in info:
+        row_num += 1
+        row_dict = {}
+        for k in row.__dict__.keys():
+            if isinstance(row.__dict__[k], sqlalchemy.orm.state.InstanceState):
+                app.logger.info('not serializable!!')
+            else:
+                row_dict[k] = row.__dict__[k]
+        data[row_num] = row_dict
+    return make_response(jsonify({'success': 'OK', 'jobs': data}), 200)
 
 
 if __name__ == "__main__":

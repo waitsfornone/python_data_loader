@@ -13,40 +13,23 @@ def freespace_check():
             'free')/1073741824
 
 
-def get_data(int_uuid, tenant_id, out_dir, query, db_host, db_user, db_pass, db_name, purge_files=True):
+def dir_write_check(file_path):
+    if not os.path.isdir(file_path) or not os.access(file_path, os.W_OK):
+        return False
+    else:
+        return True
+
+
+def file_purge(purge_files, file_epoch, file_path):
     funclogger = logging.getLogger('dataExtract.getData')
-    # Get current unix timestamp for filename
-    epoch = int(time.time())
-
-    # Get current PID for temp file
-    cur_pid = os.getpid()
-
-    # Check the output directory for proper access
-    if not os.path.isdir(out_dir) or not os.access(out_dir, os.W_OK):
-        funclogger.error('Output directory provided is not a directory, or is not writeable. Aborting job.')
-        return False
-    tmp_dir = os.path.join(out_dir, 'out')
-    if not os.path.exists(tmp_dir):
-        os.mkdir(tmp_dir)
-    if not os.access(tmp_dir, os.W_OK):
-        funclogger.error('No write access to directory for temp files. Aborting job.')
-        return False
-
-    # Setup the output file
-    tmp_filename = "{}.csv".format(str(cur_pid))
-    tmp_file = os.path.join(tmp_dir, tmp_filename)
-
-    # Freespace check
     freespace = freespace_check()
-
-    # Purge logic
     if freespace < 10:
         if purge_files:
-            files = os.listdir(tmp_dir)
+            files = os.listdir(file_path)
             if files:
                 for fle in files:
                     file_mtime = int(os.stat(fle).st_mtime)
-                    if (epoch - file_mtime) >= 7776000:
+                    if (file_epoch - file_mtime) >= 7776000:
                         os.remove(fle)
                 freespace = freespace_check()
                 if freespace < 10:
@@ -59,6 +42,36 @@ def get_data(int_uuid, tenant_id, out_dir, query, db_host, db_user, db_pass, db_
             funclogger.error('Integration does not allow purging of files and there is not enough free space to generate data. Aborting job')
             return False
         funclogger.info('Purging of files is complete. Now generating data.')
+        return True
+    else:
+        return True
+
+
+def get_data(int_uuid, tenant_id, out_dir, query, db_host, db_user, db_pass, db_name, purge_files=True):
+    funclogger = logging.getLogger('dataExtract.getData')
+    # Get current unix timestamp for filename
+    epoch = int(time.time())
+
+    # Get current PID for temp file
+    cur_pid = os.getpid()
+
+    # Check the output directory for proper access
+    if not dir_write_check(out_dir):
+        funclogger.error('Output directory provided is not a directory, or is not writeable. Aborting job.')
+        return False
+    tmp_dir = os.path.join(out_dir, 'out')
+    if not os.path.exists(tmp_dir):
+        os.mkdir(tmp_dir)
+    if not dir_write_check(tmp_dir):
+        funclogger.error('No write access to directory for temp files. Aborting job.')
+        return False
+
+    # Setup the output file
+    tmp_filename = "{}.csv".format(str(cur_pid))
+    tmp_file = os.path.join(tmp_dir, tmp_filename)
+
+    if not file_purge(purge_files, epoch, tmp_dir):
+        return False
 
     # Hash the provided query for use in the output filename
     query_hash = hashlib.md5(query).hexdigest()
