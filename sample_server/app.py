@@ -132,7 +132,11 @@ def serve_file(path):
 @app.route('/api/<tenant_id>', methods=['GET'])
 @app.route('/api/<tenant_id>/<int_uuid>', methods=['GET'])
 def send_instructions(tenant_id, int_uuid=None):
+    if not validate_tenant_id(tenant_id):
+        return make_response(jsonify({'error': 'Tenant ID not found'}), 200)
     if int_uuid:
+        if not validate_int_uuid(int_uuid):
+            return make_response(jsonify({'error': 'Integration ID not found'}), 200)
         info = DB.session.query(Instructions).filter(Instructions.int_uuid == int_uuid,
                                                      Instructions.tenant_id == tenant_id,
                                                      Instructions.active,
