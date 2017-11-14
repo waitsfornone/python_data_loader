@@ -159,5 +159,16 @@ def send_instructions(tenant_id, int_uuid=None):
     return make_response(jsonify({'success': 'OK', 'job_count': row_num, 'jobs': data}), 200)
 
 
+@app.route('/api/ack/<id>', methods=['GET'])
+def job_process_ack(id):
+    # simply update Instruction run_next to false returns OK or NOT OK
+    instruction = Instructions.query.get(id)
+    if not instruction:
+        return make_response(jsonify({'error': 'id not found'}), 200)
+    # instruction.run_next = True
+    # DB.session.commit()
+    return make_response(jsonify({'success': 'OK'}), 200)
+
+
 if __name__ == "__main__":
     app.run()
