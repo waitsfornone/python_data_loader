@@ -7,6 +7,9 @@ import logging
 import hashlib
 
 
+logging.config.fileConfig('logging.ini')
+
+
 def db_conn_create(db_info):
     if db_info['type'] == 'postgresql':
         return 'postgresql://{}:{}@{}/{}'.format(
