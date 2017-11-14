@@ -7,6 +7,17 @@ import logging
 import hashlib
 
 
+def db_conn_create(db_info):
+    if db_info['type'] == 'postgresql':
+        return 'postgresql://{}:{}@{}/{}'.format(
+                                                 db_info['db_user'],
+                                                 db_info['db_pass'],
+                                                 db_info['db_host'],
+                                                 db_info['db_name'])
+    if db_info['type'] == 'sqlite':
+        return 'sqlite+pysqlite:///{}'.format(db_info['db_file'])
+
+
 def freespace_check():
     return getattr(
             psutil.disk_usage(os.path.abspath(os.sep)),
@@ -47,7 +58,7 @@ def file_purge(purge_files, file_epoch, file_path):
         return True
 
 
-def get_data(int_uuid, tenant_id, out_dir, query, db_host, db_user, db_pass, db_name, purge_files=True):
+def get_data(int_uuid, tenant_id, out_dir, query, db_info, purge_files=True):
     funclogger = logging.getLogger('dataExtract.getData')
     # Get current unix timestamp for filename
     epoch = int(time.time())
@@ -82,7 +93,8 @@ def get_data(int_uuid, tenant_id, out_dir, query, db_host, db_user, db_pass, db_
 
     # Query DB and generate temprary file
     # There will need to be a logic set for different DB types
-    engine = sqlalchemy.create_engine('postgresql://{}:{}@{}/{}'.format(db_user, db_pass, db_host, db_name))
+    db_connection = db_conn_create(db_info)
+    engine = sqlalchemy.create_engine(db_connection)
     conn = engine.connect()
     result = conn.execute(query)
     with open(tmp_file, 'w') as tmp:
