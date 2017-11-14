@@ -1,28 +1,34 @@
 import logging
 import logging.config
 import logging.handlers
+import requests
 from data_job import get_data
 from file_uploader import upload_file
-import thread
-
-from apscheduler.schedulers.blocking import BlockingScheduler
+from multiprocessing import Pool
 
 
 logging.config.fileConfig('logging.ini')
 logger = logging.getLogger('dataExtract')
 
+END_POINT = 'http://127.0.0.1:5000/api/'
+OUT_DIR = '/Users/tenders/Documents/testing'
 
-def get_jobs(tenant_id, integration_id):
-    pass
+
+def get_jobs(tenant_id, integration_id=''):
+    url = END_POINT + tenant_id
+    if integration_id:
+        url = END_POINT + tenant_id + '/' + integration_id
+    work = requests.get(url)
+    return work.json()
 
 
-def job_wrapper_for_sub():
+def data_job(tenant_id, integration_id, db_info, command):
     fle = get_data(
-                   'testin',
-                   'testing',
-                   '/Users/tenders/Documents/testing',
-                   'select * from table',
-                   'IP address',
+                   tenant_id,
+                   integration_id,
+                   OUT_DIR,
+                   command,
+                   'host',
                    'username',
                    "password",
                    'DB'
@@ -33,18 +39,27 @@ def job_wrapper_for_sub():
         logger.error("No File to Upload!")
 
 
-def job():
-    thread.start_new_thread(
-        job_wrapper_for_sub()
-        )
+def job(tenant_id, integration_id=''):
+    work_todo = get_jobs(tenant_id, integration_id)
+    # Create pool based on job_count from response
+    pool_size = work_todo['job_count']
+    if pool_size > 4:
+        pool_size = 4
+    if work_todo['jobs']:
+        print(work_todo['jobs'])
+        worker_pool = Pool(processes=pool_size)
+        for task in work_todo['jobs']:
+            db_info = task['db_info']
+            command = task['command']
+            tenant_id = task['tenant_id']
+            integration_id = task['int_uuid']
+            args_tup = (tenant_id, integration_id, db_info, command,)
+            results = worker_pool.apply_async(data_job, args_tup)
+            logger.info(results)
+    else:
+        logger.info('No jobs to run')
+        return work_todo['job_count']
 
 
 if __name__ == '__main__':
-    scheduler = BlockingScheduler()
-    scheduler.add_job(job, 'interval', seconds=20)
-
-    try:
-        scheduler.start()
-    except (KeyboardInterrupt, SystemExit):
-        # this needs corrected
-        pass
+    job('ba91c888-a150-4e04-81ce-087d9ccd3a0f')
