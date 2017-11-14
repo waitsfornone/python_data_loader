@@ -164,7 +164,7 @@ def job_process_ack(id):
     # simply update Instruction run_next to false returns OK or NOT OK
     instruction = Instructions.query.get(id)
     if not instruction:
-        return make_response(jsonify({'error': 'id not found'}), 200)
+        return make_response(jsonify({'error': 'id not found'}), 404)
     # instruction.run_next = True
     # DB.session.commit()
     return make_response(jsonify({'success': 'OK'}), 200)
