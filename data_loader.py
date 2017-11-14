@@ -41,12 +41,10 @@ def data_job(tenant_id, integration_id, db_info, command):
 
 def job(tenant_id, integration_id=''):
     work_todo = get_jobs(tenant_id, integration_id)
-    # Create pool based on job_count from response
     pool_size = work_todo['job_count']
     if pool_size > 4:
         pool_size = 4
     if work_todo['jobs']:
-        print(work_todo['jobs'])
         worker_pool = Pool(processes=pool_size)
         for task in work_todo['jobs']:
             db_info = task['db_info']
@@ -54,6 +52,9 @@ def job(tenant_id, integration_id=''):
             tenant_id = task['tenant_id']
             integration_id = task['int_uuid']
             args_tup = (tenant_id, integration_id, db_info, command,)
+            ack_url = END_POINT + '/ack/' + task['id']
+            ack = requests.get(ack_url)
+            logger.info(ack.text)
             results = worker_pool.apply_async(data_job, args_tup)
             logger.info(results)
     else:
