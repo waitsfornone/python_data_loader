@@ -4,13 +4,16 @@ import time
 import os
 import psutil
 import logging
+import logging.config
 import hashlib
+import ast
 
 
 logging.config.fileConfig('logging.ini')
 
 
 def db_conn_create(db_info):
+    db_info = ast.literal_eval(db_info)
     if db_info['type'] == 'postgresql':
         return 'postgresql://{}:{}@{}/{}'.format(
                                                  db_info['db_user'],
@@ -110,6 +113,7 @@ def get_data(int_uuid, tenant_id, out_dir, query, db_info, purge_files=True):
         funclogger.error('Not output file was created. Aborting job.')
         return False
 
+    # not returning correctly
     if os.rename(tmp_file, out_file):
         return out_file
     else:
@@ -122,9 +126,6 @@ if __name__ == '__main__':
         'testin',
         'testing',
         '/Users/tenders/Documents/testing',
-        'query',
-        'Host',
-        'user',
-        "pass",
-        'db'
+        'select * from team;',
+        "{'type': 'sqlite', 'db_file': 'data/sample_data.db'}"
         )

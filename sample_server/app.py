@@ -93,6 +93,7 @@ def upload_files():
     if 'file_set' not in request.files:
         return make_response(jsonify({'error': 'no file provided'}), 400)
     if request.method == 'POST':
+        # this isn't working
         filename = request.files['file_set']
         filename_list = filename.split('_')
         tenant_id = filename_list[0]

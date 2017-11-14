@@ -7,7 +7,7 @@ import os
 import logging
 import requests
 
-END_POINT = 'http://127.0.0.1:5000/upload_files'
+END_POINT = 'http://127.0.0.1:5000/api/upload_files'
 
 
 def upload_file_multi(file_path):
@@ -18,7 +18,7 @@ def upload_file_multi(file_path):
                                  files={'file_set': open(os.path.join(file_path, fle), 'r')},
                                  )
         funclogger.info(response.text)
-        ret_array.append((fle, response.status_code))
+        ret_array.append((fle, response.status_code, response.text))
     return ret_array
 
 
@@ -32,4 +32,5 @@ def upload_file(file_path):
 
 
 if __name__ == "__main__":
-    upload_file_multi('/Users/tenders/Documents/testing/out')
+    results = upload_file_multi('/Users/tenders/Documents/testing/out')
+    print results
