@@ -156,7 +156,7 @@ def send_instructions(tenant_id, int_uuid=None):
             else:
                 row_dict[k] = row.__dict__[k]
         data[row_num] = row_dict
-    return make_response(jsonify({'success': 'OK', 'jobs': data}), 200)
+    return make_response(jsonify({'success': 'OK', 'job_count': row_num, 'jobs': data}), 200)
 
 
 if __name__ == "__main__":
