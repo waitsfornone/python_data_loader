@@ -22,16 +22,13 @@ def get_jobs(tenant_id, integration_id=''):
     return work.json()
 
 
-def data_job(tenant_id, integration_id, db_info, command):
+def data_job(tenant_id, integration_id, out_dir, db_info, command):
     fle = get_data(
                    tenant_id,
                    integration_id,
-                   OUT_DIR,
+                   out_dir,
                    command,
-                   'host',
-                   'username',
-                   "password",
-                   'DB'
+                   db_info
                    )
     if fle:
         upload_file(fle)
@@ -51,7 +48,7 @@ def job(tenant_id, integration_id=''):
             command = task['command']
             tenant_id = task['tenant_id']
             integration_id = task['int_uuid']
-            args_tup = (tenant_id, integration_id, db_info, command,)
+            args_tup = (tenant_id, integration_id, OUT_DIR, db_info, command,)
             ack_url = END_POINT + '/ack/' + task['id']
             ack = requests.get(ack_url)
             logger.info(ack.text)
