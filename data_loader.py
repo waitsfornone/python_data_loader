@@ -44,12 +44,12 @@ def job(tenant_id, integration_id=''):
     if work_todo['jobs']:
         worker_pool = Pool(processes=pool_size)
         for task in work_todo['jobs']:
-            db_info = task['db_info']
-            command = task['command']
-            tenant_id = task['tenant_id']
-            integration_id = task['int_uuid']
+            db_info = work_todo['jobs'][task]['db_info']
+            command = work_todo['jobs'][task]['command']
+            tenant_id = work_todo['jobs'][task]['tenant_id']
+            integration_id = work_todo['jobs'][task]['int_uuid']
             args_tup = (tenant_id, integration_id, OUT_DIR, db_info, command,)
-            ack_url = END_POINT + '/ack/' + task['id']
+            ack_url = END_POINT + 'ack/' + str(work_todo['jobs'][task]['id'])
             ack = requests.get(ack_url)
             logger.info(ack.text)
             results = worker_pool.apply_async(data_job, args_tup)
