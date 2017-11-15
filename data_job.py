@@ -7,6 +7,7 @@ import logging
 import logging.config
 import hashlib
 import ast
+import io
 
 
 logging.config.fileConfig('logging.ini')
@@ -64,6 +65,16 @@ def file_purge(purge_files, file_epoch, file_path):
         return True
 
 
+def utf_8_decoder(unicode_csv_data):
+    for line in unicode_csv_data:
+        new_line = []
+        for col in line:
+            if type(col) is unicode:
+                col = col.encode('utf-8')
+            new_line.append(col)
+        yield new_line
+
+
 def get_data(int_uuid, tenant_id, out_dir, query, db_info, purge_files=True):
     funclogger = logging.getLogger('dataExtract.getData')
     # Get current unix timestamp for filename
@@ -106,7 +117,9 @@ def get_data(int_uuid, tenant_id, out_dir, query, db_info, purge_files=True):
     with open(tmp_file, 'w') as tmp:
         fl = csv.writer(tmp)
         fl.writerow(result.keys())
-        fl.writerows(result)
+        dec_res = utf_8_decoder(result)
+        for row in dec_res:
+            fl.writerow(row)
 
     # Rename temp file permanently
     if not os.path.exists(tmp_file):
@@ -114,7 +127,8 @@ def get_data(int_uuid, tenant_id, out_dir, query, db_info, purge_files=True):
         return False
 
     # not returning correctly
-    if os.rename(tmp_file, out_file):
+    os.rename(tmp_file, out_file)
+    if os.path.isfile(out_file):
         return out_file
     else:
         funclogger.error('Rename of file failed. Aborting job.')

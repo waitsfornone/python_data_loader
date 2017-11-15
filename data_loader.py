@@ -30,6 +30,7 @@ def data_job(tenant_id, integration_id, out_dir, db_info, command):
                    command,
                    db_info
                    )
+    print(fle)
     if fle:
         upload_file(fle)
     else:
