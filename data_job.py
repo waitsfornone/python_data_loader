@@ -60,11 +60,10 @@ def file_purge(purge_files, file_epoch, file_path):
 
 
 def utf_8_decoder(unicode_csv_data):
-    # This needs more thought re: unicode handling
     for line in unicode_csv_data:
         new_line = []
         for col in line:
-            if type(col) is unicode:
+            if isinstance(col, unicode):
                 col = col.encode('utf-8')
             new_line.append(col)
         yield new_line
