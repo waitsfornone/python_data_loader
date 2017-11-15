@@ -7,7 +7,6 @@ import logging
 import logging.config
 import hashlib
 import ast
-import io
 
 
 logging.config.fileConfig('logging.ini')

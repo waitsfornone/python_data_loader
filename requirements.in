@@ -9,3 +9,5 @@ sqlalchemy
 psycopg2
 flask-uploads
 flask-wtf
+pytest
+mock
