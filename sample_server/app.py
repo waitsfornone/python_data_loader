@@ -88,13 +88,12 @@ def edit_instruction(id):
     return render_template('add_instructions.html', form=form)
 
 
-@app.route('/api/upload_files', methods=['GET', 'POST'])
-def upload_files():
+@app.route('/api/upload_files/<filename>', methods=['GET', 'POST'])
+def upload_files(filename):
     if 'file_set' not in request.files:
         return make_response(jsonify({'error': 'no file provided'}), 400)
     if request.method == 'POST':
         # this isn't working
-        filename = request.files['file_set']
         filename_list = filename.split('_')
         tenant_id = filename_list[0]
         int_uuid = filename_list[1]

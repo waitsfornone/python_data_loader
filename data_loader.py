@@ -49,7 +49,7 @@ def job(tenant_id, integration_id=''):
             command = work_todo['jobs'][task]['command']
             tenant_id = work_todo['jobs'][task]['tenant_id']
             integration_id = work_todo['jobs'][task]['int_uuid']
-            args_tup = (tenant_id, integration_id, OUT_DIR, db_info, command,)
+            args_tup = (integration_id, tenant_id, OUT_DIR, db_info, command,)
             ack_url = END_POINT + 'ack/' + str(work_todo['jobs'][task]['id'])
             ack = requests.get(ack_url)
             logger.info(ack.text)
