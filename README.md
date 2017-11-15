@@ -27,29 +27,3 @@ Basic Operation:
 
 
 The main goal of this is to require very little interaction on the remote machine with regards to the data transfer. Outside of the schedule for making the initial request, all parts of the pipeline are managed on the server side of the equation.
-
-
-Short TODO on the basic functionality:
-
-Job control
-
-    -- Need to get each run on a separate PID (threading isn't the correct answer)
-
-    -- Needs to be able to handle X number of jobs coming down (currently only 1)
-
-    -- Needs to call Uploader after each run (not currently uploading automatically)
-
-
-Data Job
-
-    -- Needs to handle more than PostgreSQL
-
-
-File Uploader
-
-    -- Should read a single file, not a directory
-
-
-Multi File Uploader
-
-    -- Create new function for multiple files with proper logging, etc.
