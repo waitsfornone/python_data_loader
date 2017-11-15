@@ -13,7 +13,7 @@ This is a portfolio project that came out of real-life requirements.
 6 -- The API will have a user interface for creating the Instruction objects (job) and track/maintain their schedule.
 
 
-Basic Operation:
+# Basic Operation:
 
 - The remote machine sends a request to the API
 
@@ -27,3 +27,21 @@ Basic Operation:
 
 
 The main goal of this is to require very little interaction on the remote machine with regards to the data transfer. Outside of the schedule for making the initial request, all parts of the pipeline are managed on the server side of the equation.
+
+## NOTE: The sample dataset is stored in git-lfs and that extension is needed to clone the repo
+
+# HOW TO RUN:
+
+This repo provides the remote data extract code, and a sample server to check it out with. 
+
+The Flask sample server is found in `sample_server/app.py`
+The Flask database is in `data/instructions.db`
+The sample dataset is in `data/sample_data.db`
+
+To start up the Scheduler and watch it run, execute `python foreman.py`
+
+Also, each piece can be run separately
+
+Scheduled Job -- `python data_loader.py`
+Data Extract -- `python data_job.py`
+File Upload -- `python file_uploader.py`
