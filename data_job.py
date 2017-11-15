@@ -44,7 +44,8 @@ def file_purge(purge_files, file_epoch, file_path):
     if not purge_files:
         funclogger.error('Integration does not allow purging of files and there is not enough free space to generate data. Aborting job')
         return False
-    if files = os.listdir(file_path):
+    files = os.listdir(file_path)
+    if files:
         for fle in files:
             file_mtime = int(os.stat(fle).st_mtime)
             if (file_epoch - file_mtime) >= 7776000:
