@@ -70,9 +70,9 @@ def add_instructions():
     return render_template('add_instructions.html', form=form)
 
 
-@app.route('/integration/<int:id>', methods=['GET', 'POST'])
-def edit_instruction(id):
-    instruction = Instructions.query.get(id)
+@app.route('/integration/<int:instruction_id>', methods=['GET', 'POST'])
+def edit_instruction(instruction_id):
+    instruction = Instructions.query.get(instruction_id)
     form = InstructionForm(obj=instruction)
     if form.validate_on_submit():
         instruction.integration_name = form.integration_name.data
@@ -159,10 +159,10 @@ def send_instructions(tenant_id, int_uuid=None):
     return make_response(jsonify({'success': 'OK', 'job_count': row_num, 'jobs': data}), 200)
 
 
-@app.route('/api/ack/<id>', methods=['GET'])
-def job_process_ack(id):
+@app.route('/api/ack/<int:instruction_id>', methods=['GET'])
+def job_process_ack(instruction_id):
     # simply update Instruction run_next to false returns OK or NOT OK
-    instruction = Instructions.query.get(id)
+    instruction = Instructions.query.get(instruction_id)
     if not instruction:
         return make_response(jsonify({'error': 'id not found'}), 404)
     instruction.run_next = False
