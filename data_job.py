@@ -31,40 +31,36 @@ def freespace_check():
 
 
 def dir_write_check(file_path):
-    if not os.path.isdir(file_path) or not os.access(file_path, os.W_OK):
-        return False
-    else:
+    if os.path.isdir(file_path) and os.access(file_path, os.W_OK):
         return True
 
 
 def file_purge(purge_files, file_epoch, file_path):
     funclogger = logging.getLogger('dataExtract.getData')
     freespace = freespace_check()
-    if freespace < 10:
-        if purge_files:
-            files = os.listdir(file_path)
-            if files:
-                for fle in files:
-                    file_mtime = int(os.stat(fle).st_mtime)
-                    if (file_epoch - file_mtime) >= 7776000:
-                        os.remove(fle)
-                freespace = freespace_check()
-                if freespace < 10:
-                    funclogger.error('Purging files did not free enough space to generate data. Aborting job.')
-                    return False
-            else:
-                funclogger.error('There are no files to purge to free space. Aborting job.')
-                return False
-        else:
-            funclogger.error('Integration does not allow purging of files and there is not enough free space to generate data. Aborting job')
-            return False
-        funclogger.info('Purging of files is complete. Now generating data.')
+    if freespace >= 10:
+        funclogger.info('There is enough free space to generate data files')
         return True
+    if not purge_files:
+        funclogger.error('Integration does not allow purging of files and there is not enough free space to generate data. Aborting job')
+        return False
+    if files = os.listdir(file_path):
+        for fle in files:
+            file_mtime = int(os.stat(fle).st_mtime)
+            if (file_epoch - file_mtime) >= 7776000:
+                os.remove(fle)
+        freespace = freespace_check()
+        if freespace >= 10:
+            funclogger.info('Purging of files is complete. Now generating data.')
+            return True
     else:
-        return True
+        funclogger.error('There are no files to purge to free space. Aborting job.')
+        return False
+    funclogger.error('Purging files did not free enough space to generate data. Aborting job.')
 
 
 def utf_8_decoder(unicode_csv_data):
+    # This needs more thought re: unicode handling
     for line in unicode_csv_data:
         new_line = []
         for col in line:
