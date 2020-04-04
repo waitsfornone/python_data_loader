@@ -37,5 +37,5 @@ six==1.11.0               # via apscheduler, flask-restful, mock, python-dateuti
 sqlalchemy==1.1.14        # via -r requirements.in, flask-sqlalchemy
 tzlocal==1.4              # via apscheduler
 urllib3==1.22             # via requests
-werkzeug==0.12.2          # via flask
+werkzeug==0.15.3          # via flask
 wtforms==2.1              # via flask-wtf
