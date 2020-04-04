@@ -32,7 +32,7 @@ pyflakes==1.5.0           # via flake8
 pytest==3.2.5             # via -r requirements.in
 python-dateutil==2.6.1    # via aniso8601
 pytz==2017.2              # via apscheduler, flask-restful, tzlocal
-requests==2.18.4          # via -r requirements.in
+requests==2.20.0          # via -r requirements.in
 six==1.11.0               # via apscheduler, flask-restful, mock, python-dateutil
 sqlalchemy==1.1.14        # via -r requirements.in, flask-sqlalchemy
 tzlocal==1.4              # via apscheduler
