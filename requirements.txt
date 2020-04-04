@@ -14,10 +14,10 @@ flask-restful==0.3.6      # via -r requirements.in
 flask-sqlalchemy==2.3.2   # via -r requirements.in
 flask-uploads==0.2.1      # via -r requirements.in
 flask-wtf==0.14.2         # via -r requirements.in
-flask==0.12.2             # via flask-restful, flask-sqlalchemy, flask-uploads, flask-wtf
+flask==1.0                # via flask-restful, flask-sqlalchemy, flask-uploads, flask-wtf
 idna==2.6                 # via requests
 itsdangerous==0.24        # via flask
-jinja2==2.9.6             # via flask
+jinja2==2.11.1            # via flask
 markupsafe==1.0           # via jinja2
 marshmallow-jsonapi==0.15.1  # via -r requirements.in
 marshmallow==2.13.6       # via marshmallow-jsonapi
@@ -37,5 +37,5 @@ six==1.11.0               # via apscheduler, flask-restful, mock, python-dateuti
 sqlalchemy==1.1.14        # via -r requirements.in, flask-sqlalchemy
 tzlocal==1.4              # via apscheduler
 urllib3==1.22             # via requests
-werkzeug==0.12.2          # via flask
+werkzeug==1.0.1           # via flask
 wtforms==2.1              # via flask-wtf
